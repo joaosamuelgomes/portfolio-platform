@@ -15,5 +15,23 @@ services:
       timeout: 3s
       retries: 10
 
+  api:
+    build: ./api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: jdbc:postgresql://db:5432/portfolio
+      DATABASE_USERNAME: portfolio
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-portfolio}
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET no arquivo .env (veja .env.example)}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      VIEWER_USERNAME: ${VIEWER_USERNAME:-recrutador}
+      VIEWER_PASSWORD: ${VIEWER_PASSWORD:-}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173}
+    ports:
+      - "8080:8080"
+
 volumes:
   db-data:
