@@ -1,0 +1,59 @@
+# Production stack on the Oracle Cloud VM: PostgreSQL, the API and Caddy in front with
+# automatic HTTPS. Only Caddy publishes ports; the database and the API stay on the
+# internal network. Run from this folder: docker compose up -d --build (see README.md).
+name: portfolio
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: portfolio
+      POSTGRES_USER: portfolio
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:?defina DATABASE_PASSWORD em deploy/.env}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U portfolio -d portfolio"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: ../api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: jdbc:postgresql://db:5432/portfolio
+      DATABASE_USERNAME: portfolio
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET em deploy/.env}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?defina ADMIN_PASSWORD em deploy/.env}
+      VIEWER_USERNAME: ${VIEWER_USERNAME:-recrutador}
+      VIEWER_PASSWORD: ${VIEWER_PASSWORD:-}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:?defina CORS_ALLOWED_ORIGINS em deploy/.env}
+      SITE_DEPLOY_HOOK_URL: ${SITE_DEPLOY_HOOK_URL:-}
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      API_DOMAIN: ${API_DOMAIN:?defina API_DOMAIN em deploy/.env}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  db-data:
+  caddy-data:
+  caddy-config:

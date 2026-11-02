@@ -17,3 +17,7 @@ dist/
 # Env
 .env
 *.local
+
+# Deploy
+deploy/backups/
+deploy/backups.log
