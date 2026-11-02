@@ -14,6 +14,15 @@ spring:
   mvc:
     problemdetails:
       enabled: true
+  jackson:
+    default-property-inclusion: non_null
+
+springdoc:
+  writer-with-order-by-keys: true
+  default-produces-media-type: application/json
+  swagger-ui:
+    operations-sorter: alpha
+    tags-sorter: alpha
 
 server:
   shutdown: graceful
