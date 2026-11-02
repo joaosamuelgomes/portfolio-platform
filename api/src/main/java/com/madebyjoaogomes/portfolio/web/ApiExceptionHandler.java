@@ -3,6 +3,7 @@ package com.madebyjoaogomes.portfolio.web;
 import com.madebyjoaogomes.portfolio.content.ContentNotFoundException;
 import com.madebyjoaogomes.portfolio.content.SlugConflictException;
 import com.madebyjoaogomes.portfolio.project.InvalidProjectOrderException;
+import com.madebyjoaogomes.portfolio.site.SiteDeployException;
 import java.util.Comparator;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -41,6 +42,13 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(InvalidProjectOrderException.class)
     ProblemDetail handleInvalidOrder(InvalidProjectOrderException exception) {
         return problem(HttpStatus.UNPROCESSABLE_ENTITY, "Ordem inválida", exception.getMessage());
+    }
+
+    @ExceptionHandler(SiteDeployException.class)
+    ProblemDetail handleSiteDeploy(SiteDeployException exception) {
+        return exception.isConfigured()
+                ? problem(HttpStatus.BAD_GATEWAY, "Falha ao atualizar o site", exception.getMessage())
+                : problem(HttpStatus.SERVICE_UNAVAILABLE, "Atualização do site desativada", exception.getMessage());
     }
 
     @ExceptionHandler(AuthenticationException.class)

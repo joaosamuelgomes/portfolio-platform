@@ -30,6 +30,7 @@ services:
       VIEWER_USERNAME: ${VIEWER_USERNAME:-recrutador}
       VIEWER_PASSWORD: ${VIEWER_PASSWORD:-}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173}
+      SITE_DEPLOY_HOOK_URL: ${SITE_DEPLOY_HOOK_URL:-}
     ports:
       - "8080:8080"
 

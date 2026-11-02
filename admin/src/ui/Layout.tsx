@@ -1,6 +1,7 @@
 import { LogOut } from 'lucide-react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '../auth/session';
+import { SiteDeployButton } from '../site/SiteDeployButton';
 import { Button } from './controls';
 
 const navClass = ({ isActive }: { isActive: boolean }) =>
@@ -31,7 +32,8 @@ export function Layout() {
               </NavLink>
             </nav>
           </div>
-          <div className="flex items-center gap-3 py-2">
+          <div className="flex flex-wrap items-center gap-3 py-2">
+            {canEdit && <SiteDeployButton />}
             <span className="font-mono text-xs text-zinc-400">
               {session?.username} <span className="text-cyan">[{canEdit ? 'ADMIN' : 'VIEWER'}]</span>
             </span>

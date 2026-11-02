@@ -42,6 +42,7 @@ O painel abre em http://localhost:5173, a origem que a API libera por padrão em
 - **Perfis.** ADMIN edita tudo. VIEWER, a conta para recrutadores, navega pelas mesmas telas com os formulários desabilitados e sem as ações de escrita; a API também recusa essas operações para esse perfil.
 - **Formulários.** O case inteiro (resumo, página, funcionalidades, imagens, resultados, depoimento e SEO) é editado em campos, não em JSON. Listas de textos usam uma linha por item, e campos opcionais vazios são enviados como ausentes. O artigo tem editor de Markdown com pré-visualização.
 - **Ordem.** As setas da lista de projetos enviam a nova ordem completa para `PUT /admin/projects/order`.
+- **Atualizar site.** Publicar muda o que `GET /public/content` devolve; o site estático só muda no próximo build. O botão "Atualizar site" (ADMIN) pede esse build pela API, que chama o Deploy Hook do Vercel configurado em `SITE_DEPLOY_HOOK_URL`. Sem a variável, o botão fica desativado ([ADR 0004](../docs/adr/0004-site-le-a-api-no-build.md)).
 
 ## Estrutura
 
@@ -51,6 +52,7 @@ src/
 ├── auth/       sessão, login e provider
 ├── projects/   lista, edição e conversão entre formulário e API
 ├── articles/   lista, edição com pré-visualização e conversão
+├── site/       botão "Atualizar site" (deploy do site estático)
 ├── ui/         layout, controles e utilitários compartilhados
 └── test/       setup, fixtures e helpers de renderização com fetch simulado
 ```

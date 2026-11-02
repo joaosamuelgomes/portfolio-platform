@@ -14,7 +14,7 @@ API e painel administrativo do portfólio [madebyjoaogomes.com](https://madebyjo
 
 ## Como se integra ao site
 
-O site continua estático no Vercel. No build, ele busca o conteúdo publicado em um endpoint público da API e gera um snapshot no mesmo formato de `src/generated/content.json`. Se a API estiver fora do ar, o build usa o último snapshot. Publicar no painel dispara um novo deploy por Deploy Hook.
+O site continua estático no Vercel. No build, com `CONTENT_API_URL` definida, ele lê o conteúdo publicado em `GET /public/content` e gera o mesmo snapshot que antes vinha da pasta `content/`. Se a API não responder, o build falha e o deploy atual continua no ar. Depois de publicar no painel, o botão "Atualizar site" chama a API, que aciona o Deploy Hook do Vercel ([ADR 0004](docs/adr/0004-site-le-a-api-no-build.md)).
 
 ## Rodando
 

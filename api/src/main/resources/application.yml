@@ -16,8 +16,15 @@ spring:
       enabled: true
   jackson:
     default-property-inclusion: non_null
+  http:
+    client:
+      # Only outgoing call: the site's Deploy Hook.
+      connect-timeout: 5s
+      read-timeout: 10s
 
 app:
+  site:
+    deploy-hook-url: ${SITE_DEPLOY_HOOK_URL:}
   security:
     jwt:
       secret: ${JWT_SECRET:}
