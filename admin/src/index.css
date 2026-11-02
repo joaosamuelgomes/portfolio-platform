@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+/* Same tokens as the site (madebyjoaogomes.com, src/index.css), so the panel reads as part of it. */
+@theme {
+  --font-display: 'Chakra Petch', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-sans: 'Space Grotesk', sans-serif;
+
+  --color-acid: #ccff00;
+  --color-cyan: #00f0ff;
+  --color-crimson: #ff003c;
+  --color-dark: #08080c;
+  --color-dark-panel: #0d0e14;
+  --color-dark-border: #1a1c24;
+}
+
+@layer base {
+  html {
+    background-color: var(--color-dark);
+    color: #f4f4f5;
+    font-family: var(--font-sans);
+    color-scheme: dark;
+  }
+
+  body {
+    color: #e4e4e7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-display);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-acid);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: var(--color-acid);
+    color: #000;
+  }
+}
+
+.markdown-preview :where(h2, h3) { font-family: var(--font-display); font-weight: 700; color: #f4f4f5; margin: 1.5em 0 0.5em; }
+.markdown-preview h2 { font-size: 1.5rem; text-transform: uppercase; }
+.markdown-preview h3 { font-size: 1.2rem; }
+.markdown-preview :where(p, ul, ol, blockquote, pre, table) { margin: 0 0 1em; line-height: 1.7; }
+.markdown-preview ul { list-style: square; padding-left: 1.5em; }
+.markdown-preview ol { list-style: decimal; padding-left: 1.5em; }
+.markdown-preview a { color: var(--color-acid); text-decoration: underline; }
+.markdown-preview blockquote { border-left: 2px solid var(--color-cyan); padding-left: 1em; color: #a1a1aa; }
+.markdown-preview code { font-family: var(--font-mono); font-size: 0.9em; color: var(--color-cyan); }
+.markdown-preview pre { background: #000; border: 1px solid var(--color-dark-border); padding: 1em; overflow-x: auto; }
+.markdown-preview :where(th, td) { border: 1px solid var(--color-dark-border); padding: 0.4em 0.8em; text-align: left; }

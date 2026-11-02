@@ -7,7 +7,7 @@ API e painel administrativo do portfólio [madebyjoaogomes.com](https://madebyjo
 | Pasta | Conteúdo |
 | --- | --- |
 | `api/` | Java 21, Spring Boot 3, PostgreSQL + Flyway, Spring Security com JWT, OpenAPI (springdoc) |
-| `admin/` | React, TypeScript, Vite, Tailwind e TanStack Query, com cliente gerado a partir do OpenAPI |
+| `admin/` | React, TypeScript, Vite, Tailwind e TanStack Query, com cliente gerado a partir do OpenAPI ([admin/README.md](admin/README.md)) |
 | `scripts/` | Import do conteúdo atual do site (`content/`) para a API ([api/README.md](api/README.md#importando-o-conteúdo-do-site)) |
 | `docker-compose.yml` | Sobe a API e o banco com um comando |
 | `docs/adr/` | Decisões de arquitetura |
@@ -18,4 +18,4 @@ O site continua estático no Vercel. No build, ele busca o conteúdo publicado e
 
 ## Rodando
 
-Veja [api/README.md](api/README.md): `cp .env.example .env`, preencha os segredos e rode `docker compose up --build`.
+Veja [api/README.md](api/README.md): `cp .env.example .env`, preencha os segredos e rode `docker compose up --build`. O painel roda com `npm run dev` em `admin/` ([admin/README.md](admin/README.md)).
