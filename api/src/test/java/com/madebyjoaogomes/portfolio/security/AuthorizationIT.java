@@ -16,6 +16,7 @@ import com.madebyjoaogomes.portfolio.project.ProjectOrderRequest;
 import com.madebyjoaogomes.portfolio.project.ProjectRequest;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -48,7 +49,7 @@ class AuthorizationIT extends IntegrationTest {
 
     @Test
     void tokenCarriesTheAccountRole() throws Exception {
-        mvc.perform(withJson(post("/auth/token"), Map.of("username", VIEWER, "password", "viewer-test-password")))
+        mvc.perform(withJson(post("/auth/token"), Map.of("username", VIEWER, "password", passwordOf(VIEWER))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.tokenType").value("Bearer"))
                 .andExpect(jsonPath("$.expiresIn").value(3600))
@@ -57,14 +58,14 @@ class AuthorizationIT extends IntegrationTest {
 
     @Test
     void wrongPasswordIsUnauthorized() throws Exception {
-        mvc.perform(withJson(post("/auth/token"), Map.of("username", ADMIN, "password", "errada")))
+        mvc.perform(withJson(post("/auth/token"), Map.of("username", ADMIN, "password", UUID.randomUUID().toString())))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.title").value("Credenciais inválidas"));
     }
 
     @Test
     void accountWithoutPasswordIsDisabled() throws Exception {
-        mvc.perform(withJson(post("/auth/token"), Map.of("username", "desativado", "password", "qualquer")))
+        mvc.perform(withJson(post("/auth/token"), Map.of("username", "desativado", "password", UUID.randomUUID().toString())))
                 .andExpect(status().isUnauthorized());
     }
 

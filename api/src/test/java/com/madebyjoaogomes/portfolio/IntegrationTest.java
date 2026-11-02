@@ -4,6 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.madebyjoaogomes.portfolio.security.SecurityProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -38,13 +39,25 @@ public abstract class IntegrationTest {
     @Autowired
     private JdbcTemplate jdbc;
 
+    @Autowired
+    private SecurityProperties security;
+
     @BeforeEach
     void cleanDatabase() {
         jdbc.execute("truncate table projects, articles restart identity");
     }
 
+    /** The password configured for {@code username} in application-test.yml. */
+    protected String passwordOf(String username) {
+        return security.users().stream()
+                .filter(account -> account.username().equals(username))
+                .map(SecurityProperties.Account::password)
+                .findFirst()
+                .orElseThrow();
+    }
+
     protected String token(String username) throws Exception {
-        var password = ADMIN.equals(username) ? "admin-test-password" : "viewer-test-password";
+        var password = passwordOf(username);
         var response = mvc.perform(post("/auth/token")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json.writeValueAsString(new LoginBody(username, password))))
