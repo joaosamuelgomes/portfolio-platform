@@ -54,6 +54,10 @@ public class OpenApiConfig {
                 if (path.endsWith("/order")) {
                     addProblem(operation, "422", "A ordem não lista cada projeto exatamente uma vez");
                 }
+                if (path.equals("/admin/site/deploy")) {
+                    addProblem(operation, "502", "O Deploy Hook do site falhou");
+                    addProblem(operation, "503", "SITE_DEPLOY_HOOK_URL não configurada");
+                }
                 if (path.equals("/auth/token")) {
                     addProblem(operation, "401", "Usuário ou senha incorretos");
                 }
