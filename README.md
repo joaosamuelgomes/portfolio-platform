@@ -8,6 +8,7 @@ API e painel administrativo do portfólio [madebyjoaogomes.com](https://madebyjo
 | --- | --- |
 | `api/` | Java 21, Spring Boot 3, PostgreSQL + Flyway, Spring Security com JWT, OpenAPI (springdoc) |
 | `admin/` | React, TypeScript, Vite, Tailwind e TanStack Query, com cliente gerado a partir do OpenAPI |
+| `scripts/` | Import do conteúdo atual do site (`content/`) para a API ([api/README.md](api/README.md#importando-o-conteúdo-do-site)) |
 | `docker-compose.yml` | Sobe a API e o banco com um comando |
 | `docs/adr/` | Decisões de arquitetura |
 

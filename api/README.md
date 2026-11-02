@@ -37,6 +37,38 @@ JWT_SECRET=<32+ caracteres> ADMIN_PASSWORD=<senha> VIEWER_PASSWORD=<senha> LOG_F
 
 `LOG_FORMAT=` vazio troca os logs JSON (ECS) pelo formato legível de desenvolvimento.
 
+### Importando o conteúdo do site
+
+Antes de o build do site ler a API, o banco precisa ter o conteúdo que hoje está em `content/` no repositório do site. O script `scripts/import-content.mjs` (Node 20.12+) lê `content/projects/*.json` e `content/articles/*.md`, cria tudo pelos endpoints de admin e publica o que tem `published: true`; o resto fica como `DRAFT`. O nome do arquivo vira o `slug`.
+
+Com a API no ar (`docker compose up --build`) e `ADMIN_PASSWORD` no `.env` da raiz:
+
+```bash
+cd scripts
+npm install
+node import-content.mjs --dry-run
+```
+
+```bash
+node import-content.mjs
+```
+
+| Opção | Padrão | Uso |
+| --- | --- | --- |
+| `--content <pasta>` (ou `CONTENT_DIR`) | `../portfolio/content`, ao lado deste repositório | Pasta `content/` do site |
+| `--api <url>` (ou `API_URL`) | `http://localhost:8080` | Onde a API está |
+| `--dry-run` | | Só lê e valida os arquivos, sem chamar a API |
+
+O usuário e a senha vêm de `ADMIN_USERNAME` e `ADMIN_PASSWORD` (do ambiente ou do `.env`).
+
+Os ids dos projetos aparecem nas URLs `/case/{id}` e não podem mudar. Como a API gera o id, o script cria os projetos em ordem de id num banco vazio e confere cada id devolvido; por isso:
+
+- os ids em `content/projects` precisam ser `1..n`, sem lacunas;
+- o script recusa rodar se o banco já tem qualquer projeto ou artigo. Para importar de novo, recomece o banco com `docker compose down -v`;
+- se a sequência do banco já tiver sido usada (projetos criados e excluídos), o primeiro id sai errado: o script desfaz o que criou e para.
+
+Depois da carga, a ordem de exibição segue o campo `order` dos arquivos e o script compara `GET /public/content` com os arquivos: ids, ordem e conteúdo de cada projeto e artigo publicado, e se os rascunhos ficaram como `DRAFT`. Qualquer diferença (por exemplo, um campo que a API não aceita e descartaria) faz o script terminar com erro.
+
 ### Testes
 
 ```bash
