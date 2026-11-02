@@ -1,0 +1,19 @@
+# Test-only secrets: never used outside the integration tests.
+app:
+  security:
+    jwt:
+      secret: integration-tests-only-secret-0123456789abcdef
+    users:
+      - username: admin
+        password: admin-test-password
+        role: ADMIN
+      - username: recrutador
+        password: viewer-test-password
+        role: VIEWER
+      - username: desativado
+        role: ADMIN
+
+logging:
+  structured:
+    format:
+      console: ""

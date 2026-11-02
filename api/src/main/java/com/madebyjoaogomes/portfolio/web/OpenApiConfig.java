@@ -54,9 +54,12 @@ public class OpenApiConfig {
                 if (path.endsWith("/order")) {
                     addProblem(operation, "422", "A ordem não lista cada projeto exatamente uma vez");
                 }
+                if (path.equals("/auth/token")) {
+                    addProblem(operation, "401", "Usuário ou senha incorretos");
+                }
                 if (operation.getRequestBody() != null) {
                     addProblem(operation, "400", "Requisição inválida; veja a propriedade errors");
-                    if (method == PathItem.HttpMethod.POST || path.endsWith("{id}")) {
+                    if (path.startsWith("/admin/") && (method == PathItem.HttpMethod.POST || path.endsWith("{id}"))) {
                         addProblem(operation, "409", "Slug em uso");
                     }
                 }
