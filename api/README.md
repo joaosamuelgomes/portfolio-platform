@@ -147,3 +147,4 @@ src/main/resources/db/migration/   migrações Flyway
 - [ADR 0002: Autenticação JWT stateless emitida pela própria API](../docs/adr/0002-autenticacao-jwt-stateless.md)
 - [ADR 0003: Formato do snapshot público](../docs/adr/0003-formato-do-snapshot.md)
 - [ADR 0004: O site lê a API no build e é atualizado por um pedido explícito](../docs/adr/0004-site-le-a-api-no-build.md)
+- [ADR 0005: API e banco numa VM Always Free da Oracle Cloud](../docs/adr/0005-api-numa-vm-always-free.md)
