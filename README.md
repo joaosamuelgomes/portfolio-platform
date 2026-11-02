@@ -14,3 +14,7 @@ API e painel administrativo do portfólio [madebyjoaogomes.com](https://madebyjo
 ## Como se integra ao site
 
 O site continua estático no Vercel. No build, ele busca o conteúdo publicado em um endpoint público da API e gera um snapshot no mesmo formato de `src/generated/content.json`. Se a API estiver fora do ar, o build usa o último snapshot. Publicar no painel dispara um novo deploy por Deploy Hook.
+
+## Rodando
+
+Veja [api/README.md](api/README.md): `cp .env.example .env`, preencha os segredos e rode `docker compose up --build`.
