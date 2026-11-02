@@ -89,6 +89,7 @@ cd api
 | `ADMIN_USERNAME` / `ADMIN_PASSWORD` | `admin` / vazio | Conta que escreve. Sem senha, fica desativada |
 | `VIEWER_USERNAME` / `VIEWER_PASSWORD` | `recrutador` / vazio | Conta demo só leitura. Sem senha, fica desativada |
 | `CORS_ALLOWED_ORIGINS` | `http://localhost:5173` | Origens do painel admin, separadas por vírgula |
+| `SITE_DEPLOY_HOOK_URL` | vazio | Deploy Hook do Vercel que gera o site de novo ([ADR 0004](../docs/adr/0004-site-le-a-api-no-build.md)). Segredo; sem ela, "Atualizar site" fica desativado |
 | `LOG_FORMAT` | `ecs` | Formato dos logs estruturados (`ecs`, `logstash`, `gelf`); vazio desliga |
 
 As senhas podem ser texto (viram BCrypt na inicialização) ou um hash pronto no formato `{bcrypt}$2a$...`.
@@ -104,6 +105,8 @@ As senhas podem ser texto (viram BCrypt na inicialização) ou um hash pronto no
 | `POST /admin/projects/{id}/publish`, `/unpublish`, `/archive` | ADMIN | Muda o status |
 | `PUT /admin/projects/order` | ADMIN | Recebe todos os ids na nova ordem |
 | `/admin/articles/...` | idem | Mesmo conjunto para artigos, sem a ordenação |
+| `GET /admin/site` | ADMIN, VIEWER | Se o deploy do site está configurado e quando foi o último pedido |
+| `POST /admin/site/deploy` | ADMIN | Chama o Deploy Hook: o site é gerado de novo com o conteúdo publicado |
 | `GET /actuator/health` | aberto | Saúde, com probes de liveness e readiness |
 | `/swagger-ui/index.html`, `/v3/api-docs` | aberto | Documentação e contrato OpenAPI |
 
@@ -133,6 +136,7 @@ src/main/java/com/madebyjoaogomes/portfolio/
 ├── article/    entidade, serviço e controller de /admin/articles
 ├── content/    status compartilhado e o snapshot público (/public/content)
 ├── security/   JWT, contas e regras de acesso
+├── site/       pedido de deploy do site estático (Deploy Hook)
 └── web/        ProblemDetail e configuração do OpenAPI
 src/main/resources/db/migration/   migrações Flyway
 ```
@@ -142,3 +146,4 @@ src/main/resources/db/migration/   migrações Flyway
 - [ADR 0001: Blocos de apresentação do projeto em JSONB](../docs/adr/0001-blocos-do-projeto-em-jsonb.md)
 - [ADR 0002: Autenticação JWT stateless emitida pela própria API](../docs/adr/0002-autenticacao-jwt-stateless.md)
 - [ADR 0003: Formato do snapshot público](../docs/adr/0003-formato-do-snapshot.md)
+- [ADR 0004: O site lê a API no build e é atualizado por um pedido explícito](../docs/adr/0004-site-le-a-api-no-build.md)

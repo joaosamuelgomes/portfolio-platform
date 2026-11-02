@@ -36,6 +36,6 @@ O site é estático e gera, no build, o arquivo `src/generated/content.json` a p
 
 ## Consequências
 
-- Na Fase 4, o `build-content.mjs` troca a leitura de arquivos pela chamada à API e reaproveita todo o resto. Se a API estiver fora do ar, o build usa o último snapshot gerado.
+- Na Fase 4, o `build-content.mjs` troca a leitura de arquivos pela chamada à API e reaproveita todo o resto. Se a API estiver fora do ar, o build falha e o deploy atual continua no ar (revisto no [ADR 0004](0004-site-le-a-api-no-build.md)).
 - A API não tem lógica de apresentação nem dependência de renderizador de Markdown.
 - O contrato está no OpenAPI (`ContentSnapshot`, `PublishedProject`, `PublishedArticle`), então o site pode gerar os tipos em vez de mantê-los à mão.
