@@ -138,7 +138,7 @@
                 <!-- Coverage of unit and integration tests in one report (target/site/jacoco), read by SonarCloud. -->
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.13</version>
+                <version>0.8.16</version>
                 <executions>
                     <execution>
                         <goals>

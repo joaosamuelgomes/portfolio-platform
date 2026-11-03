@@ -43,7 +43,13 @@ public class SecurityConfig {
 
     private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
 
+    /**
+     * CSRF stays off on purpose: the API never reads credentials from cookies, only from the
+     * Authorization header, which a cross-site request cannot attach. With no ambient
+     * credential there is nothing for a forged request to ride on (ADR 0002).
+     */
     @Bean
+    @SuppressWarnings("java:S4502")
     SecurityFilterChain securityFilterChain(HttpSecurity http, ProblemDetailSecurityHandler problemHandler)
             throws Exception {
         return http

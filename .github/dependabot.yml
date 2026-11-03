@@ -1,10 +1,15 @@
 # Monthly update PRs, one per ecosystem, so the deps of a mostly idle project do not go stale.
+# Major versions (Spring Boot 4, a new Java, TypeScript 7...) are migrations, planned by hand:
+# Dependabot only proposes minor and patch updates.
 version: 2
 updates:
   - package-ecosystem: maven
     directory: /api
     schedule:
       interval: monthly
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       maven:
         patterns: ["*"]
@@ -12,14 +17,23 @@ updates:
     directory: /
     schedule:
       interval: monthly
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: docker
     directory: /api
     schedule:
       interval: monthly
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: npm
     directory: /admin
     schedule:
       interval: monthly
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       admin:
         patterns: ["*"]
@@ -27,3 +41,6 @@ updates:
     directory: /scripts
     schedule:
       interval: monthly
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
