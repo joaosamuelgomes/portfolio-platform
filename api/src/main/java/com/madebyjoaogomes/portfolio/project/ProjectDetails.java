@@ -1,5 +1,6 @@
 package com.madebyjoaogomes.portfolio.project;
 
+import com.madebyjoaogomes.portfolio.content.SiteUrl;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -13,15 +14,15 @@ public record ProjectDetails(
         @NotBlank String platform,
         @NotBlank String sector,
         @NotBlank String challenge,
-        @NotBlank String challengeImage,
+        @NotBlank @SiteUrl String challengeImage,
         @NotBlank String challengeImageAlt,
         @NotBlank String challengeImageLabel,
         @NotNull List<@NotBlank String> painPoints,
         @NotBlank String strategy,
-        @NotBlank String strategyImage,
+        @NotBlank @SiteUrl String strategyImage,
         @NotBlank String strategyImageAlt,
         @NotBlank String strategyImageLabel,
-        @NotBlank String solutionImage,
+        @NotBlank @SiteUrl String solutionImage,
         @NotBlank String solutionImageAlt,
         @NotBlank String solutionImageLabel,
         @NotNull List<@Valid @NotNull CaseFeature> features,

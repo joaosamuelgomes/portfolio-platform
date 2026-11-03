@@ -1,6 +1,7 @@
 package com.madebyjoaogomes.portfolio.article;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.madebyjoaogomes.portfolio.content.SiteUrl;
 import com.madebyjoaogomes.portfolio.content.Slugs;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
@@ -19,9 +20,9 @@ public record ArticleRequest(
         @NotBlank @Size(max = 120) @Pattern(regexp = Slugs.PATTERN) String slug,
         @NotBlank @Size(max = 200) String title,
         @NotBlank @Size(max = 500) String description,
-        @NotBlank String markdown,
+        @NotBlank @Size(max = 200_000) String markdown,
         List<@NotBlank String> tags,
-        @Size(max = 500) String image,
+        @Size(max = 500) @SiteUrl String image,
         @Positive Integer imageWidth,
         @Positive Integer imageHeight,
         @Size(max = 300) String imageAlt,

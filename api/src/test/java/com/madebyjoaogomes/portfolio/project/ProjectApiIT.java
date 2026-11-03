@@ -1,6 +1,7 @@
 package com.madebyjoaogomes.portfolio.project;
 
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -88,6 +89,19 @@ class ProjectApiIT extends IntegrationTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("$.errors[*].field", hasItem("details.heroSubtitle")))
                 .andExpect(jsonPath("$.errors[*].field", hasItem("slug")));
+    }
+
+    @Test
+    void rejectsImageUrlsWithOtherSchemes() throws Exception {
+        var body = json.valueToTree(request("esquema"));
+        ((ObjectNode) body).put("thumbnail", "javascript:alert(1)");
+        ((ObjectNode) body.get("details").get("features").get(0)).put("image", "//outro-site.com/x.png");
+        ((ObjectNode) body.get("seo")).put("image", "data:image/svg+xml,<svg onload=alert(1)>");
+
+        mvc.perform(withJson(as(ADMIN, post("/admin/projects")), body))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[*].field", hasItems(
+                        "thumbnail", "details.features[0].image", "seo.image")));
     }
 
     @Test

@@ -98,7 +98,7 @@ As senhas podem ser texto (viram BCrypt na inicialização) ou um hash pronto no
 
 | Método e rota | Acesso | O que faz |
 | --- | --- | --- |
-| `POST /auth/token` | aberto | Troca usuário e senha por um JWT |
+| `POST /auth/token` | aberto | Troca usuário e senha por um JWT. Depois de 10 falhas em 15 minutos, o mesmo endereço recebe 429 com `Retry-After` |
 | `GET /public/content` | aberto | Projetos e artigos publicados, no formato do snapshot do site |
 | `GET /admin/projects`, `GET /admin/projects/{id}` | ADMIN, VIEWER | Lista (filtro opcional `?status=`) e detalhe |
 | `POST`, `PUT /{id}`, `DELETE /{id}` em `/admin/projects` | ADMIN | Cria (como rascunho, no fim da ordem), substitui e exclui |
@@ -120,7 +120,7 @@ TOKEN=$(curl -s -X POST localhost:8080/auth/token -H 'Content-Type: application/
 curl -H "Authorization: Bearer $TOKEN" localhost:8080/admin/projects
 ```
 
-Erros seguem a RFC 9457 (`application/problem+json`); erros de validação trazem a lista `errors` com `field` e `message`.
+Erros seguem a RFC 9457 (`application/problem+json`); erros de validação trazem a lista `errors` com `field` e `message`. Campos de imagem aceitam só caminhos do site (`/capa.png`) ou URLs `https://`.
 
 ## Modelo
 
