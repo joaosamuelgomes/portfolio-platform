@@ -1,7 +1,7 @@
 # Multi-stage build; both base images are multi-arch, so this also builds on the ARM (Ampere) VM.
 # The build stage runs on the builder's own platform: a cross build from CI (amd64 to arm64)
 # compiles natively and only the small runtime stage goes through emulation.
-FROM --platform=$BUILDPLATFORM eclipse-temurin:21-jdk AS build
+FROM --platform=$BUILDPLATFORM eclipse-temurin:25-jdk AS build
 WORKDIR /workspace
 
 COPY .mvn .mvn
@@ -12,7 +12,7 @@ COPY src src
 RUN sh mvnw -B -q package -DskipTests \
     && java -Djarmode=tools -jar target/portfolio-api-*.jar extract --layers --launcher --destination extracted
 
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:25-jre
 WORKDIR /app
 RUN groupadd --system app && useradd --system --gid app app
 
