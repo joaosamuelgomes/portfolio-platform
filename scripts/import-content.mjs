@@ -216,10 +216,10 @@ const main = async () => {
         if (article.published) await api('POST', `/admin/articles/${id}/publish`, { token });
     }
 
-    const snapshot = await verify(token, projects, articles);
-    console.log(`Pronto: ${projects.length} projeto(s) e ${articles.length} artigo(s) importados. `
-        + `/public/content tem ${snapshot.projects.length} projeto(s) [ids ${snapshot.projects.map((project) => Number(project.id)).join(', ')}] `
-        + `e ${snapshot.articles.length} artigo(s) publicado(s).`);
+    // verify() throws if /public/content differs from the files, so the counts below are the API's too.
+    // Only local values go to the log: nothing the API returned is echoed into it.
+    await verify(token, projects, articles);
+    console.log(`Pronto: ${projects.length} projeto(s) e ${articles.length} artigo(s) importados e conferidos em /public/content.`);
 };
 
 main().catch((error) => {
