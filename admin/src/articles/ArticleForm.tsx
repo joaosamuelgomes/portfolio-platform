@@ -1,3 +1,4 @@
+import DOMPurify from 'dompurify';
 import { marked } from 'marked';
 import { useState } from 'react';
 import { type FieldPath, useForm, useWatch } from 'react-hook-form';
@@ -88,8 +89,9 @@ export function ArticleForm({ initial, isNew, readOnly, onSubmit }: ArticleFormP
           {preview ? (
             <div
               className="markdown-preview min-h-64 border border-dark-border bg-black/40 p-5 text-zinc-300"
-              // The author's own Markdown, rendered the same way the site's build does.
-              dangerouslySetInnerHTML={{ __html: marked.parse(markdown, { async: false }) }}
+              // Rendered the way the site's build does, then sanitized: Markdown allows raw HTML,
+              // and an article must not run script in the panel, where the session token lives.
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(marked.parse(markdown, { async: false })) }}
             />
           ) : (
             <TextArea

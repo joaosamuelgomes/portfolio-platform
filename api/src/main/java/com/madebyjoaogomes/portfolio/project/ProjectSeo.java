@@ -1,5 +1,6 @@
 package com.madebyjoaogomes.portfolio.project;
 
+import com.madebyjoaogomes.portfolio.content.SiteUrl;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -9,7 +10,7 @@ import java.util.List;
 public record ProjectSeo(
         @NotBlank String title,
         @NotBlank String description,
-        @NotBlank String image,
+        @NotBlank @SiteUrl String image,
         @NotNull @Positive Integer imageWidth,
         @NotNull @Positive Integer imageHeight,
         @NotBlank String imageAlt,

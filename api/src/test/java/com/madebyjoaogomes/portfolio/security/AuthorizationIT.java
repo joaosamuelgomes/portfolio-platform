@@ -20,6 +20,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 class AuthorizationIT extends IntegrationTest {
 
@@ -61,6 +62,25 @@ class AuthorizationIT extends IntegrationTest {
         mvc.perform(withJson(post("/auth/token"), Map.of("username", ADMIN, "password", UUID.randomUUID().toString())))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.title").value("Credenciais inválidas"));
+    }
+
+    @Test
+    void repeatedFailuresBlockTheAddress() throws Exception {
+        // Its own address, so the shared limiter does not affect the other tests' logins.
+        RequestPostProcessor attacker = request -> {
+            request.setRemoteAddr("203.0.113.7");
+            return request;
+        };
+        var wrong = Map.of("username", ADMIN, "password", UUID.randomUUID().toString());
+        for (int attempt = 0; attempt < 10; attempt++) {
+            mvc.perform(withJson(post("/auth/token"), wrong).with(attacker)).andExpect(status().isUnauthorized());
+        }
+
+        mvc.perform(withJson(post("/auth/token"), Map.of("username", ADMIN, "password", passwordOf(ADMIN))).with(attacker))
+                .andExpect(status().isTooManyRequests())
+                .andExpect(header().exists(HttpHeaders.RETRY_AFTER))
+                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON));
+        token(ADMIN);
     }
 
     @Test

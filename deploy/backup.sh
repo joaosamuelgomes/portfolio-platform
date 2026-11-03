@@ -2,6 +2,7 @@
 # Daily logical backup of the database, keeping the last 14 dumps. Installed as a cron job
 # by setup.sh; restore with: gunzip -c <file> | docker compose exec -T db psql -U portfolio portfolio
 set -eu
+umask 077  # the dumps hold the whole database
 
 cd "$(dirname "$0")"
 mkdir -p backups

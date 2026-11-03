@@ -3,6 +3,7 @@ package com.madebyjoaogomes.portfolio.security;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import java.time.Duration;
 import java.util.List;
@@ -19,7 +20,14 @@ import org.springframework.validation.annotation.Validated;
 public record SecurityProperties(
         @Valid @NotNull Jwt jwt,
         @Valid @DefaultValue List<Account> users,
-        @DefaultValue List<String> corsAllowedOrigins) {
+        @DefaultValue List<String> corsAllowedOrigins,
+        @Valid @DefaultValue LoginLimit loginLimit) {
+
+    /** Failed logins allowed per client address within {@code window}. */
+    public record LoginLimit(
+            @DefaultValue("10") @Positive int maxFailures,
+            @DefaultValue("PT15M") Duration window) {
+    }
 
     public record Jwt(
             @NotBlank(message = "defina JWT_SECRET (32+ caracteres)")
