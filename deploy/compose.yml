@@ -20,6 +20,8 @@ services:
       retries: 10
 
   api:
+    # CI publishes the image (see .github/workflows/ci.yml); push.sh still builds it on the VM.
+    image: ghcr.io/joaosamuelgomes/portfolio-api:${API_IMAGE_TAG:-latest}
     build: ../api
     restart: unless-stopped
     depends_on:

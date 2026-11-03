@@ -23,13 +23,18 @@ api.madebyjoaogomes.com ── Oracle Cloud VM: Caddy :443 → API :8080 → Pos
 - `compose.yml`: a stack. Só o Caddy publica portas; banco e API ficam na rede interna.
 - `Caddyfile`: HTTPS automático (Let's Encrypt) para `API_DOMAIN`, corpo das requisições limitado a 1 MB e proxy para a API.
 - `setup.sh`: prepara uma VM Ubuntu nova (Docker, iptables, rpcbind desligado, swap e o backup no cron).
-- `backup.sh`: `pg_dump` diário às 03:30 em `deploy/backups/` (só o dono lê), mantendo os 14 mais recentes.
+- `backup.sh`: `pg_dump` diário às 03:30 em `deploy/backups/` (só o dono lê), mantendo os 14 mais recentes, e uma cópia no Object Storage (bucket `portfolio-backups`) quando `BACKUP_UPLOAD_URL` está no `.env`.
 - `push.sh`: envia `api/` e `deploy/` de um commit para a VM e reconstrói a stack.
 - `.env` (só na VM, `chmod 600`): segredos de produção, gerados na própria VM.
 
 ## Atualizar a API
 
-O repositório é privado e a VM não tem credencial do GitHub: ela recebe um snapshot do commit por SSH.
+Cada push na `main` passa pelo workflow [CI/CD](../.github/workflows/ci.yml): testes da API e do painel, imagem ARM publicada em `ghcr.io/joaosamuelgomes/portfolio-api` e deploy na VM por SSH, com checagem do `/actuator/health` no fim.
+
+- O deploy usa uma chave SSH só dele (secrets `DEPLOY_SSH_KEY`, `DEPLOY_HOST` e `DEPLOY_KNOWN_HOSTS`, com a chave do servidor fixada), sem port forwarding nem terminal.
+- A VM não guarda credencial do GitHub: o token do job chega pelo stdin só para o `docker pull` e é deslogado em seguida.
+
+Sem o GitHub (ou para testar um commit antes do merge), o deploy manual continua funcionando e constrói a imagem na própria VM:
 
 ```bash
 DEPLOY_HOST=ubuntu@163.176.137.21 deploy/push.sh origin/main
@@ -52,5 +57,5 @@ cd ~/portfolio-platform/deploy && docker compose ps && docker compose logs -f ap
 ## Limites conhecidos
 
 - Uma VM só, sem réplica. Se ela cair, o painel para, mas o site continua no ar (é estático) e só não recebe atualizações.
-- O backup fica no mesmo disco da VM. Protege contra erro de operação, não contra perda da VM.
+- A cópia externa do backup vai para uma URL pré-autenticada que só permite escrita: a VM envia dumps, mas não lê nem apaga os que já estão lá. Para restaurar a partir dela, baixe o arquivo pelo console da Oracle.
 - O IP público é efêmero: sobrevive a reinicializações, mas muda se a instância for terminada (aí é preciso atualizar o registro `api` no DNS).
