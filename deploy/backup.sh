@@ -15,7 +15,8 @@ docker compose exec -T db pg_dump -U portfolio --clean --if-exists portfolio | g
 ls -1t backups/portfolio-*.sql.gz | tail -n +15 | xargs -r rm --
 echo "backup: $file"
 
-upload_url="$(grep -s '^BACKUP_UPLOAD_URL=' .env | cut -d= -f2- || true)"
+# tr: tolerates a .env edited on Windows (CRLF line endings).
+upload_url="$(grep -s '^BACKUP_UPLOAD_URL=' .env | cut -d= -f2- | tr -d '\r' || true)"
 if [ -n "$upload_url" ]; then
     curl -fsS --retry 3 --max-time 300 -T "$file" "${upload_url%/}/$(basename "$file")"
     echo "uploaded: $(basename "$file")"

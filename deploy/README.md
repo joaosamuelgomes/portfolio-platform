@@ -57,5 +57,5 @@ cd ~/portfolio-platform/deploy && docker compose ps && docker compose logs -f ap
 ## Limites conhecidos
 
 - Uma VM só, sem réplica. Se ela cair, o painel para, mas o site continua no ar (é estático) e só não recebe atualizações.
-- A cópia externa do backup vai para uma URL pré-autenticada que só permite escrita: a VM envia dumps, mas não lê nem apaga os que já estão lá. Para restaurar a partir dela, baixe o arquivo pelo console da Oracle.
+- A cópia externa do backup vai para uma URL pré-autenticada que só permite escrita (válida até 03/11/2030): a VM envia dumps, mas não lê, não lista nem apaga os que já estão lá. Uma regra de retenção de 30 dias impede sobrescrever ou apagar um dump recente. Para restaurar a partir dela, baixe o arquivo pelo console da Oracle.
 - O IP público é efêmero: sobrevive a reinicializações, mas muda se a instância for terminada (aí é preciso atualizar o registro `api` no DNS).
