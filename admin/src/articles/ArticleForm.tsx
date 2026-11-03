@@ -76,7 +76,7 @@ export function ArticleForm({ initial, isNew, readOnly, onSubmit }: ArticleFormP
 
         <section className="border border-dark-border bg-dark-panel p-5 sm:p-6">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <h2 className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-cyan">// Corpo em Markdown</h2>
+            <h2 className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-cyan">{'// Corpo em Markdown'}</h2>
             <div role="group" aria-label="Modo do editor" className="flex">
               <Button variant={preview ? 'ghost' : 'secondary'} aria-pressed={!preview} onClick={() => setPreview(false)}>
                 Escrever

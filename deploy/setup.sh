@@ -4,7 +4,8 @@
 set -euo pipefail
 
 if ! command -v docker >/dev/null; then
-    curl -fsSL https://get.docker.com | sudo sh
+    # HTTPS only, redirects included.
+    curl --proto '=https' --tlsv1.2 -fsSL https://get.docker.com | sudo sh
     sudo usermod -aG docker "$USER"
 fi
 
