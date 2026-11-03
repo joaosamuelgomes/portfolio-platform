@@ -54,6 +54,18 @@ describe('ArticleEditPage', () => {
     expect(sent[0]).toMatchObject({ title: 'Novo título', slug: 'portfolio-full-stack' });
   });
 
+  it('strips script from the Markdown preview', async () => {
+    const markdown = '## Título\n\n<img src="/x.png" alt="x" onerror="alert(1)"><script>alert(2)</script>';
+    mockApi({ 'GET /admin/articles/1': () => article({ markdown }) });
+    renderEditor();
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Pré-visualizar' }));
+
+    const image = await screen.findByRole('img', { name: 'x' });
+    expect(image).not.toHaveAttribute('onerror');
+    expect(document.querySelector('.markdown-preview script')).toBeNull();
+  });
+
   it('opens read-only for the recruiter account', async () => {
     mockApi({ 'GET /admin/articles/1': () => article() });
     renderEditor('VIEWER');
