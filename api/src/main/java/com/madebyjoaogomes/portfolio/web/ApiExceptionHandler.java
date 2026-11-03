@@ -3,6 +3,7 @@ package com.madebyjoaogomes.portfolio.web;
 import com.madebyjoaogomes.portfolio.content.ContentNotFoundException;
 import com.madebyjoaogomes.portfolio.content.SlugConflictException;
 import com.madebyjoaogomes.portfolio.project.InvalidProjectOrderException;
+import com.madebyjoaogomes.portfolio.security.TooManyLoginAttemptsException;
 import com.madebyjoaogomes.portfolio.site.SiteDeployException;
 import java.util.Comparator;
 import java.util.Map;
@@ -54,6 +55,14 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(AuthenticationException.class)
     ProblemDetail handleBadCredentials(AuthenticationException exception) {
         return problem(HttpStatus.UNAUTHORIZED, "Credenciais inválidas", "Usuário ou senha incorretos");
+    }
+
+    @ExceptionHandler(TooManyLoginAttemptsException.class)
+    ResponseEntity<ProblemDetail> handleTooManyLogins(TooManyLoginAttemptsException exception) {
+        var seconds = Math.max(1, exception.retryAfter().toSeconds());
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .header(HttpHeaders.RETRY_AFTER, String.valueOf(seconds))
+                .body(problem(HttpStatus.TOO_MANY_REQUESTS, "Muitas tentativas", exception.getMessage()));
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)

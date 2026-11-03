@@ -60,6 +60,7 @@ public class OpenApiConfig {
                 }
                 if (path.equals("/auth/token")) {
                     addProblem(operation, "401", "Usuário ou senha incorretos");
+                    addProblem(operation, "429", "Falhas de login demais deste endereço; veja Retry-After");
                 }
                 if (operation.getRequestBody() != null) {
                     addProblem(operation, "400", "Requisição inválida; veja a propriedade errors");
