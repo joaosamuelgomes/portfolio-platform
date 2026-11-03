@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.16</version>
+        <version>4.1.2</version>
         <relativePath/>
     </parent>
 
@@ -18,7 +18,7 @@
 
     <properties>
         <java.version>21</java.version>
-        <springdoc.version>2.10.0</springdoc.version>
+        <springdoc.version>3.2.0</springdoc.version>
         <!-- Placeholder so @{argLine} resolves when no coverage agent sets it. -->
         <argLine/>
     </properties>
@@ -138,7 +138,7 @@
                 <!-- Coverage of unit and integration tests in one report (target/site/jacoco), read by SonarCloud. -->
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.13</version>
+                <version>0.8.16</version>
                 <executions>
                     <execution>
                         <goals>
