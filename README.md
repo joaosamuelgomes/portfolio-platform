@@ -1,5 +1,10 @@
 # portfolio-platform
 
+[![CI/CD](https://github.com/joaosamuelgomes/portfolio-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/joaosamuelgomes/portfolio-platform/actions/workflows/ci.yml)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=joaosamuelgomes_portfolio-platform&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=joaosamuelgomes_portfolio-platform)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=joaosamuelgomes_portfolio-platform&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=joaosamuelgomes_portfolio-platform)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=joaosamuelgomes_portfolio-platform&metric=coverage)](https://sonarcloud.io/summary/new_code?id=joaosamuelgomes_portfolio-platform)
+
 API e painel administrativo do portfólio [madebyjoaogomes.com](https://madebyjoaogomes.com). Aqui se cadastram e publicam os projetos e artigos que o site estático ([joaosamuelgomes/portfolio](https://github.com/joaosamuelgomes/portfolio)) consome no build.
 
 ## Estrutura
