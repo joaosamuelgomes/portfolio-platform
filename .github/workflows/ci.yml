@@ -1,0 +1,129 @@
+name: CI/CD
+
+# Every push and pull request runs the API and admin checks. A push to main also publishes the
+# API image to GHCR and deploys it to the VM (deploy/README.md).
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+permissions:
+  contents: read
+
+jobs:
+  api:
+    name: API (unit and integration tests)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+      # Integration tests start PostgreSQL with Testcontainers on the runner's Docker.
+      - run: ./mvnw -B verify
+
+  admin:
+    name: Admin panel (lint, tests and build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: admin
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: admin/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+
+  image:
+    name: Publish API image
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: [api, admin]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: docker/setup-qemu-action@v4
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      # The VM is ARM (Ampere); Maven runs natively and only the runtime stage is emulated.
+      - uses: docker/build-push-action@v7
+        with:
+          context: api
+          platforms: linux/arm64
+          push: true
+          tags: |
+            ghcr.io/joaosamuelgomes/portfolio-api:${{ github.sha }}
+            ghcr.io/joaosamuelgomes/portfolio-api:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy to the VM
+    needs: image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    env:
+      TAG: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy && chmod 600 ~/.ssh/deploy
+          # Pinned host key: the job refuses to talk to anything but the real VM.
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - name: Ship deploy/ and start the new image
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ssh_vm() { ssh -i ~/.ssh/deploy -o BatchMode=yes "$DEPLOY_HOST" "$@"; }
+          caddy_before=$(ssh_vm 'sha256sum portfolio-platform/deploy/Caddyfile 2>/dev/null || true')
+          tar -c deploy | ssh_vm 'mkdir -p portfolio-platform && tar -x -C portfolio-platform && chmod +x portfolio-platform/deploy/*.sh'
+          caddy_after=$(ssh_vm 'sha256sum portfolio-platform/deploy/Caddyfile')
+          # The job's token reaches the VM on stdin, only for this pull, and is logged out after.
+          printf '%s' "$GHCR_TOKEN" | ssh_vm "cd portfolio-platform/deploy \
+            && docker login ghcr.io -u ${{ github.actor }} --password-stdin >/dev/null \
+            && API_IMAGE_TAG=$TAG docker compose pull api; status=\$?; docker logout ghcr.io >/dev/null; exit \$status"
+          # Also tagged latest on the VM, so a plain "docker compose up -d" there keeps this image.
+          ssh_vm "cd portfolio-platform/deploy \
+            && docker tag ghcr.io/joaosamuelgomes/portfolio-api:$TAG ghcr.io/joaosamuelgomes/portfolio-api:latest \
+            && docker compose up -d --no-build --remove-orphans && docker image prune -f >/dev/null"
+          if [ "$caddy_before" != "$caddy_after" ]; then
+            ssh_vm 'cd portfolio-platform/deploy && docker compose restart caddy'
+          fi
+      - name: Check the API is up
+        run: |
+          for attempt in $(seq 1 30); do
+            curl -fsS https://api.madebyjoaogomes.com/actuator/health && exit 0
+            sleep 5
+          done
+          echo "API did not become healthy" >&2
+          exit 1

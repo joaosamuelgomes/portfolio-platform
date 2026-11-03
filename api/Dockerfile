@@ -1,5 +1,7 @@
 # Multi-stage build; both base images are multi-arch, so this also builds on the ARM (Ampere) VM.
-FROM eclipse-temurin:21-jdk AS build
+# The build stage runs on the builder's own platform: a cross build from CI (amd64 to arm64)
+# compiles natively and only the small runtime stage goes through emulation.
+FROM --platform=$BUILDPLATFORM eclipse-temurin:21-jdk AS build
 WORKDIR /workspace
 
 COPY .mvn .mvn

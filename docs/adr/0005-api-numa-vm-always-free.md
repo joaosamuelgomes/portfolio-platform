@@ -13,9 +13,9 @@ Uma VM `VM.Standard.A1.Flex` (Ampere, ARM) da Oracle Cloud, dentro do Always Fre
 
 - **Sem portas internas expostas:** só o Caddy publica 80/443; banco e API ficam na rede do Compose.
 - **Segredos gerados na VM:** o `.env` de produção é criado na própria máquina (`chmod 600`) e não passa pelo repositório nem pela Vercel. A URL do Deploy Hook também fica só lá.
-- **Deploy por snapshot:** o repositório é privado; `deploy/push.sh` envia `api/` e `deploy/` de um commit por SSH, sem credencial do GitHub no servidor.
+- **Deploy pela CI:** cada push na `main` testa, publica a imagem ARM no GHCR e faz o deploy por SSH com uma chave dedicada; o token do GitHub só passa pela VM durante o `docker pull`. O `deploy/push.sh` (snapshot do commit por SSH, imagem construída na VM) fica como caminho manual.
 - **Custo vigiado:** um budget de R$ 1/mês na conta, com alerta em 80%.
-- **Backup:** `pg_dump` diário no disco da VM, com 14 dias de retenção.
+- **Backup:** `pg_dump` diário no disco da VM, com 14 dias de retenção, e uma cópia num bucket privado do Object Storage (Always Free) por uma URL pré-autenticada só de escrita.
 
 ## Alternativas
 
@@ -27,5 +27,5 @@ Uma VM `VM.Standard.A1.Flex` (Ampere, ARM) da Oracle Cloud, dentro do Always Fre
 
 - Operação por conta própria: atualizações do Ubuntu, do Docker e das imagens são manuais.
 - Ponto único de falha. Se a VM cair, o painel para; o site, estático, continua no ar com o último build.
-- O backup no mesmo disco não protege contra perda da VM; copiar os dumps para fora (Object Storage, também Always Free) é o próximo passo se o conteúdo crescer.
-- A imagem da API é construída na própria VM (ARM), sem registry.
+- A cópia no Object Storage cobre a perda da VM. Como a URL só escreve, uma VM comprometida não apaga o histórico; a retenção fica a cargo de uma regra de ciclo de vida do bucket.
+- A imagem ARM é construída na CI com o estágio de build nativo (só o runtime passa por emulação) e fica no GHCR, privada como o repositório.
