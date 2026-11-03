@@ -1,0 +1,25 @@
+# Monthly update PRs, one per ecosystem, so the deps of a mostly idle project do not go stale.
+version: 2
+updates:
+  - package-ecosystem: maven
+    directory: /api
+    schedule:
+      interval: monthly
+    groups:
+      maven:
+        patterns: ["*"]
+  - package-ecosystem: docker
+    directory: /api
+    schedule:
+      interval: monthly
+  - package-ecosystem: npm
+    directory: /admin
+    schedule:
+      interval: monthly
+    groups:
+      admin:
+        patterns: ["*"]
+  - package-ecosystem: npm
+    directory: /scripts
+    schedule:
+      interval: monthly
