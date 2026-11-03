@@ -21,9 +21,9 @@ api.madebyjoaogomes.com ── Oracle Cloud VM: Caddy :443 → API :8080 → Pos
 ## Arquivos
 
 - `compose.yml`: a stack. Só o Caddy publica portas; banco e API ficam na rede interna.
-- `Caddyfile`: HTTPS automático (Let's Encrypt) para `API_DOMAIN` e proxy para a API.
-- `setup.sh`: prepara uma VM Ubuntu nova (Docker, iptables, swap e o backup no cron).
-- `backup.sh`: `pg_dump` diário às 03:30 em `deploy/backups/`, mantendo os 14 mais recentes.
+- `Caddyfile`: HTTPS automático (Let's Encrypt) para `API_DOMAIN`, corpo das requisições limitado a 1 MB e proxy para a API.
+- `setup.sh`: prepara uma VM Ubuntu nova (Docker, iptables, rpcbind desligado, swap e o backup no cron).
+- `backup.sh`: `pg_dump` diário às 03:30 em `deploy/backups/` (só o dono lê), mantendo os 14 mais recentes.
 - `push.sh`: envia `api/` e `deploy/` de um commit para a VM e reconstrói a stack.
 - `.env` (só na VM, `chmod 600`): segredos de produção, gerados na própria VM.
 
