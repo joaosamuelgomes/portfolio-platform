@@ -31,6 +31,17 @@ jobs:
           cache: maven
       # Integration tests start PostgreSQL with Testcontainers on the runner's Docker.
       - run: ./mvnw -B verify
+      # Classes, dependencies and the JaCoCo report for the Sonar job.
+      - run: ./mvnw -B -q dependency:copy-dependencies -DincludeScope=compile -DoutputDirectory=target/libs
+      - uses: actions/upload-artifact@v7
+        with:
+          name: api-analysis
+          path: |
+            api/target/classes
+            api/target/test-classes
+            api/target/libs
+            api/target/site/jacoco/jacoco.xml
+          retention-days: 1
 
   admin:
     name: Admin panel (lint, tests and build)
@@ -45,10 +56,40 @@ jobs:
           node-version: 24
           cache: npm
           cache-dependency-path: admin/package-lock.json
-      - run: npm ci
+      # No dependency lifecycle scripts: nothing in the tree needs one.
+      - run: npm ci --ignore-scripts
       - run: npm run lint
-      - run: npm test
+      - run: npm run test:coverage
       - run: npm run build
+      # lcov paths are relative to admin/; Sonar reads them from the repository root.
+      - run: sed -i 's#^SF:#SF:admin/#' coverage/lcov.info
+      - uses: actions/upload-artifact@v7
+        with:
+          name: admin-coverage
+          path: admin/coverage/lcov.info
+          retention-days: 1
+
+  sonar:
+    name: SonarCloud analysis
+    needs: [api, admin]
+    # Pull requests from forks get no secrets, so they skip the analysis.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # blame data for new-code detection
+      - uses: actions/download-artifact@v8
+        with:
+          name: api-analysis
+          path: api/target
+      - uses: actions/download-artifact@v8
+        with:
+          name: admin-coverage
+          path: admin/coverage
+      - uses: SonarSource/sonarqube-scan-action@e805d875275f728fac1885b413934be6d7c63f65 # v8.4.1
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   image:
     name: Publish API image
@@ -60,15 +101,16 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v7
-      - uses: docker/setup-qemu-action@v4
-      - uses: docker/setup-buildx-action@v4
-      - uses: docker/login-action@v4
+      # Third-party actions pinned to a commit; Dependabot proposes the updates.
+      - uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       # The VM is ARM (Ampere); Maven runs natively and only the runtime stage is emulated.
-      - uses: docker/build-push-action@v7
+      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: api
           platforms: linux/arm64

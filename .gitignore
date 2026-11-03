@@ -21,3 +21,6 @@ dist/
 # Deploy
 deploy/backups/
 deploy/backups.log
+
+# Test coverage
+coverage/

@@ -99,7 +99,7 @@ export function Section({ title, children, actions }: { title: string; children:
   return (
     <section className="border border-dark-border bg-dark-panel p-5 sm:p-6">
       <div className="mb-5 flex items-center justify-between gap-4">
-        <h2 className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-cyan">// {title}</h2>
+        <h2 className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-cyan">{`// ${title}`}</h2>
         {actions}
       </div>
       <div className="grid gap-4 sm:grid-cols-2">{children}</div>

@@ -218,7 +218,7 @@ const main = async () => {
 
     const snapshot = await verify(token, projects, articles);
     console.log(`Pronto: ${projects.length} projeto(s) e ${articles.length} artigo(s) importados. `
-        + `/public/content tem ${snapshot.projects.length} projeto(s) [ids ${snapshot.projects.map((project) => project.id).join(', ')}] `
+        + `/public/content tem ${snapshot.projects.length} projeto(s) [ids ${snapshot.projects.map((project) => Number(project.id)).join(', ')}] `
         + `e ${snapshot.articles.length} artigo(s) publicado(s).`);
 };
 
